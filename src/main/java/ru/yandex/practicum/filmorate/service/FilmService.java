@@ -79,7 +79,7 @@ public class FilmService {
     }
     
     public void checkReleaseDate(Film film) throws ValidationException {
-        if (LocalDate.of(1895,12,28).isAfter(film.getReleaseDate())) {
+        if (LocalDate.of(1895, 12, 28).isAfter(film.getReleaseDate())) {
             throw new ValidationException("Дата выпуска не ранее 28 декабря 1895 года");
         }
     }
