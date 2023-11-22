@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.model;
 
-import com.fasterxml.jackson.annotation.JsonTypeId;
 import lombok.Data;
 
 import javax.validation.constraints.Email;
