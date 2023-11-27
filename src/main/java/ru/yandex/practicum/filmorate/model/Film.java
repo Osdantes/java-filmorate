@@ -23,6 +23,7 @@ public class Film {
     @Min(value = 1)
     private int duration;
     private final Set<Long> likes = new HashSet<>();
+    
     public int getLikesCount() {
         return likes.size();
     }
