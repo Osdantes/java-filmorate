@@ -3,18 +3,15 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.BindingResult;
 import ru.yandex.practicum.filmorate.exception.IncorrectParamException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
-import ru.yandex.practicum.filmorate.validate.Validate;
 
-import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+
 
 @Slf4j
 @Service
@@ -29,16 +26,13 @@ public class FilmService {
         this.userStorage = userStorage;
     }
 
-    public Film create(Film film, BindingResult bindingResult) {
-        checkReleaseDate(film);
-        Validate.validate(bindingResult);
+    public Film create(Film film) {
         filmStorage.create(film);
         log.info("Фильм успешно добавлен. {}", film);
         return film;
     }
 
-    public Film update(Film film, BindingResult bindingResult) {
-        Validate.validate(bindingResult);
+    public Film update(Film film) {
         filmStorage.update(film);
         log.info("Фильм успешно обновлён. {}", film);
         return film;
@@ -49,10 +43,11 @@ public class FilmService {
     }
 
     public Film getByIdFilm(long id) {
-        if (filmStorage.getByIdFilm(id) == null) {
+        if (filmStorage.getByIdFilm(id) != null) {
+            return filmStorage.getByIdFilm(id);
+        } else {
             throw new IncorrectParamException("Неверный id!");
         }
-        return filmStorage.getByIdFilm(id);
     }
 
     public void addLike(long idFilm, long idUser) {
@@ -73,14 +68,8 @@ public class FilmService {
 
     public List<Film> getPopularFilms(int count) {
         return filmStorage.getFilms().stream()
-                .sorted(Comparator.comparingInt(f0 -> f0.getLikes().size() * -1))
+                .sorted(Comparator.comparingInt(Film::getLikesCount).reversed())
                 .limit(count)
                 .collect(Collectors.toList());
-    }
-
-    public void checkReleaseDate(Film film) throws ValidationException {
-        if (LocalDate.of(1895, 12, 28).isAfter(film.getReleaseDate())) {
-            throw new ValidationException("Дата выпуска не ранее 28 декабря 1895 года");
-        }
     }
 }

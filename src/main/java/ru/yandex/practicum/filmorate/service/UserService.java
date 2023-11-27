@@ -3,11 +3,9 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.BindingResult;
 import ru.yandex.practicum.filmorate.exception.IncorrectParamException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
-import ru.yandex.practicum.filmorate.validate.Validate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,23 +22,14 @@ public class UserService {
         this.userStorage = userStorage;
     }
 
-    private void validate(User user) {
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-    }
-
-    public User create(User user, BindingResult bindingResult) {
-        Validate.validate(bindingResult);
+    public User create(User user) {
         validate(user);
         userStorage.create(user);
         log.info("Пользователь успешно создан. {}", user);
         return user;
     }
 
-    public User update(User user, BindingResult bindingResult) {
-        Validate.validate(bindingResult);
-        validate(user);
+    public User update(User user) {
         userStorage.update(user);
         log.info("Пользователь успешно обновлён. {}", user);
         return user;
@@ -94,5 +83,11 @@ public class UserService {
         return friendsUser.stream()
                 .map(userStorage::getByIdUser)
                 .collect(Collectors.toList());
+    }
+
+    private void validate(User user) {
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
     }
 }
