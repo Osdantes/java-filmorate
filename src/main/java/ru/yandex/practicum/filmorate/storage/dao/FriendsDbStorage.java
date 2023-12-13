@@ -58,7 +58,7 @@ public class FriendsDbStorage {
         return userDbStorage.getFriendsByUserId(userId);
     }
 
-    public List<User> getCommonFriendsList(long userId, long otherId)  {
+    public List<User> getCommonFriendsList(long userId, long otherId) {
         return userDbStorage.getCommonFriendsByUsersIds(userId, otherId);
     }
 }

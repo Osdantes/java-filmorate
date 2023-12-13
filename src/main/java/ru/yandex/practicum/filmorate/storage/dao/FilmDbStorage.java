@@ -164,7 +164,7 @@ public class FilmDbStorage implements FilmStorage {
         }
         List<Genre> genre = genreDbStorage.findGenreByFilmId(id);
         if (filmRows.getInt("mpa_code") > 0) {
-            Mpa mpa  = mpaDbStorage.findPmaByCode(filmRows.getInt("mpa_code"));
+            Mpa mpa = mpaDbStorage.findPmaByCode(filmRows.getInt("mpa_code"));
             return Film.builder()
                     .id(id)
                     .name(filmRows.getString("name"))
@@ -204,7 +204,7 @@ public class FilmDbStorage implements FilmStorage {
         List<Genre> genre = genreDbStorage.findGenreByFilmId(id);
         log.info("Фильм с id = {}", id);
         if (rs.getInt("mpa_code") > 0) {
-            Mpa mpa  = mpaDbStorage.findPmaByCode(rs.getInt("mpa_code"));
+            Mpa mpa = mpaDbStorage.findPmaByCode(rs.getInt("mpa_code"));
             return Film.builder()
                     .id(id)
                     .name(rs.getString("name"))

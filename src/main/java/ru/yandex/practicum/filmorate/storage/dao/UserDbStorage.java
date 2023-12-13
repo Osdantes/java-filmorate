@@ -42,7 +42,7 @@ public class UserDbStorage implements UserStorage {
                     "values(?, ?, ?, ?)";
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
-                PreparedStatement ps = connection.prepareStatement(sqlInsertUser, new String[] { "id" });
+                PreparedStatement ps = connection.prepareStatement(sqlInsertUser, new String[]{"id"});
                 ps.setString(1, user.getName());
                 ps.setString(2, user.getLogin());
                 ps.setString(3, user.getEmail());
