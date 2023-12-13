@@ -13,21 +13,21 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 public class UserController {
+    @Autowired
     private final UserService userService;
 
-    @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
     }
 
     @PostMapping
-    public User create(@Valid @RequestBody User user) {
-        return userService.create(user);
+    public User addUser(@Valid @RequestBody User user) {
+        return userService.addUser(user);
     }
 
     @PutMapping
-    public User update(@Valid @RequestBody User user) {
-        return userService.update(user);
+    public User updateUser(@Valid @RequestBody User user) {
+        return userService.updateUser(user);
     }
 
     @GetMapping
@@ -36,28 +36,27 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public User getByIdUser(@PathVariable long id) {
-        return userService.getByIdUser(id);
+    public User getUserById(@PathVariable Long id) {
+        return userService.getUserById(id);
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public void addFriend(@PathVariable("id") long idUser, @PathVariable("friendId") long idFriend) {
-        userService.addFriend(idUser, idFriend);
+    public void addFriend(@PathVariable long id, @PathVariable long friendId) {
+        userService.addFriend(id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    public void deleteFriend(@PathVariable("id") long idUser, @PathVariable("friendId") long idFriend) {
-        userService.deleteFriend(idUser, idFriend);
+    public void deleteFriend(@PathVariable long id, @PathVariable long friendId) {
+        userService.deleteFriend(id, friendId);
     }
 
     @GetMapping("/{id}/friends")
-    public List<User> getUserFriends(@PathVariable long id) {
-        return userService.getUserFriends(id);
+    public List<User> getFriendsList(@PathVariable long id) {
+        return userService.getFriendsList(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public List<User> getUserFriendsCommonWithOtherUser(@PathVariable("id") long idUser,
-                                                        @PathVariable("otherId") long idOtherUser) {
-        return userService.getUserFriendsCommonWithOtherUser(idUser, idOtherUser);
+    public List<User> getCommonFriendsList(@PathVariable long id, @PathVariable long otherId) {
+        return userService.getCommonFriendsList(id, otherId);
     }
 }
