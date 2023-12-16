@@ -1,10 +1,11 @@
 package ru.yandex.practicum.filmorate.storage.dao;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exception.GenreNotFoundException;
+import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.sql.ResultSet;
@@ -13,12 +14,9 @@ import java.util.List;
 
 @Repository
 @Slf4j
+@RequiredArgsConstructor
 public class GenreDbStorage {
     private final JdbcTemplate jdbcTemplate;
-
-    public GenreDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
 
     public Genre addGenre(Genre genre) {
         jdbcTemplate.update("insert into genre_dic(genre_code, genre) values(?, ?)", genre.getId(), genre.getName());
@@ -37,7 +35,7 @@ public class GenreDbStorage {
             return new Genre(genreDicRows.getInt("genre_code"), genreDicRows.getString("genre"));
         } else {
             log.info("Термин жанра с кодом {} не найден.", code);
-            throw new GenreNotFoundException(String.format("Термин жанра с кодом %d не найден.", code));
+            throw new DataNotFoundException(String.format("Термин жанра с кодом %d не найден.", code));
         }
     }
 

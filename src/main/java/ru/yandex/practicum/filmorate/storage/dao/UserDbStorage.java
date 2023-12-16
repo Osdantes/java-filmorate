@@ -1,12 +1,13 @@
 package ru.yandex.practicum.filmorate.storage.dao;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
@@ -19,12 +20,9 @@ import java.util.*;
 
 @Repository("userDbStorage")
 @Slf4j
+@RequiredArgsConstructor
 public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
-
-    public UserDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
 
     private boolean isValid(User user) {
         if (user.getLogin() == null || user.getLogin().contains(" ")) {
@@ -72,7 +70,7 @@ public class UserDbStorage implements UserStorage {
             log.info(String.format("Изменен пользователь %d", user.getId()));
             return user;
         }
-        throw new UserNotFoundException(String.format("Не существует пользователя с заданным id %d.", user.getId()));
+        throw new DataNotFoundException(String.format("Не существует пользователя с заданным id %d.", user.getId()));
     }
 
     public List<User> getUsers() {
@@ -83,7 +81,7 @@ public class UserDbStorage implements UserStorage {
     public User getUserById(Long id) {
         SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from users where id = ?", id);
         if (!userRows.next()) {
-            throw new UserNotFoundException(String.format("Не найден пользователь с заданным id %d.", id));
+            throw new DataNotFoundException(String.format("Не найден пользователь с заданным id %d.", id));
         }
 
         return User.builder()

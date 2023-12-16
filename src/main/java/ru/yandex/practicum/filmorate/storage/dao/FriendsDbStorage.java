@@ -1,24 +1,21 @@
 package ru.yandex.practicum.filmorate.storage.dao;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
 
 @Repository
 @Slf4j
+@RequiredArgsConstructor
 public class FriendsDbStorage {
     private final JdbcTemplate jdbcTemplate;
     private final UserDbStorage userDbStorage;
 
-    public FriendsDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.userDbStorage = new UserDbStorage(jdbcTemplate);
-    }
 
     public void addFriendRequest(User requestUser, User acceptUser) {
         String sql = "insert into friends_link(request_user_id, accept_user_id, status_code) values(?, ?, 1)";

@@ -1,10 +1,11 @@
 package ru.yandex.practicum.filmorate.storage.dao;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exception.MpaNotFoundException;
+import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.sql.ResultSet;
@@ -13,12 +14,9 @@ import java.util.List;
 
 @Repository
 @Slf4j
+@RequiredArgsConstructor
 public class MpaDbStorage {
     private final JdbcTemplate jdbcTemplate;
-
-    public MpaDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
 
     public Mpa addMpa(Mpa mpa) {
         jdbcTemplate.update("insert into mpa_dic(mpa_code, mpa) values(?, ?)", mpa.getId(), mpa.getName());
@@ -37,7 +35,7 @@ public class MpaDbStorage {
             return new Mpa(mpaDicRows.getInt("mpa_code"), mpaDicRows.getString("mpa"));
         } else {
             log.info("Термин рейтинга с кодом {} не найден.", code);
-            throw new MpaNotFoundException(String.format("Термин рейтинга с кодом %d не найден.", code));
+            throw new DataNotFoundException(String.format("Термин рейтинга с кодом %d не найден.", code));
         }
     }
 

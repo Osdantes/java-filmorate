@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.dao;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -7,7 +8,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.Constants;
-import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -23,18 +24,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
-@Repository("filmDbStorage")
+@Repository
 @Slf4j
+@RequiredArgsConstructor
 public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
     private final MpaDbStorage mpaDbStorage;
     private final GenreDbStorage genreDbStorage;
 
-    public FilmDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.mpaDbStorage = new MpaDbStorage(jdbcTemplate);
-        this.genreDbStorage = new GenreDbStorage(jdbcTemplate);
-    }
 
     private boolean isValid(Film film) {
         if (film.getReleaseDate() == null || film.getReleaseDate().isBefore(Constants.MIN_RELEASE_DATE)) {
@@ -145,7 +142,7 @@ public class FilmDbStorage implements FilmStorage {
             log.info(String.format("Изменена информация о фильме %d.", film.getId()));
             return getFilmById(film.getId());
         }
-        throw new FilmNotFoundException(String.format("Не существует фильм с заданным id %d.", film.getId()));
+        throw new DataNotFoundException(String.format("Не существует фильм с заданным id %d.", film.getId()));
     }
 
     public List<Film> getFilms() {
@@ -160,7 +157,7 @@ public class FilmDbStorage implements FilmStorage {
     public Film getFilmById(Long id) {
         SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from films where id = ?", id);
         if (!filmRows.next()) {
-            throw new FilmNotFoundException(String.format("Не найден фильм с заданным id %d.", id));
+            throw new DataNotFoundException(String.format("Не найден фильм с заданным id %d.", id));
         }
         List<Genre> genre = genreDbStorage.findGenreByFilmId(id);
         if (filmRows.getInt("mpa_code") > 0) {

@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.dao;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -10,16 +11,11 @@ import java.util.List;
 
 @Repository
 @Slf4j
+@RequiredArgsConstructor
 public class LikesDbStorage {
     private final JdbcTemplate jdbcTemplate;
     private final UserDbStorage userDbStorage;
     private final FilmDbStorage filmDbStorage;
-
-    public LikesDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.userDbStorage = new UserDbStorage(jdbcTemplate);
-        this.filmDbStorage = new FilmDbStorage(jdbcTemplate);
-    }
 
     public void addLike(Film film, User user) {
         String sql = "insert into likes_link(user_id, film_id) values(?, ?)";
