@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
@@ -29,7 +30,7 @@ public class FriendsDbStorage {
         String sql = "select status_code from friends_link where request_user_id = ? and accept_user_id = ?";
         SqlRowSet userRows = jdbcTemplate.queryForRowSet(sql, requestUser.getId(), acceptUser.getId());
         if (!userRows.next()) {
-            throw new UserNotFoundException(String.format(
+            throw new DataNotFoundException(String.format(
                     "Не найдено запроса в друзья от пользователя %d к пользователю %d.",
                     requestUser.getId(), acceptUser.getId()));
         }
