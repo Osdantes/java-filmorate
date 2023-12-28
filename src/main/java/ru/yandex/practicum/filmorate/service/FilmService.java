@@ -59,6 +59,7 @@ public class FilmService {
     }
 
     public List<Film> getCommonFilms(long userId, long friendId) {
+        log.info("Список общих фильмов между двумя пользователями {} и {}", userId, friendId);
         return filmStorage.getCommonFilms(userId, friendId);
     }
 }

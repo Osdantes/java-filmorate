@@ -197,9 +197,7 @@ public class FilmDbStorage implements FilmStorage {
                 "where l1.user_id = ? " +
                 "and l2.user_id = ? " +
                 "and l1.user_id <> l2.user_id";
-        List<Film> films = jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs), userId, friendId);
-        System.out.println(films);
-        return films;
+        return jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs), userId, friendId);
     }
 
     private Film makeFilm(ResultSet rs) throws SQLException {
