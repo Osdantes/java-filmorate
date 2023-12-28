@@ -57,4 +57,8 @@ public class FilmService {
         log.info(String.format("Список %d самых популярных фильмов.", count));
         return likesDbStorage.getFilmsPopularList(count);
     }
+
+    public List<Film> getCommonFilms(long userId, long friendId) {
+        return filmStorage.getCommonFilms(userId, friendId);
+    }
 }
