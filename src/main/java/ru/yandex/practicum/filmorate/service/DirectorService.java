@@ -30,9 +30,11 @@ public class DirectorService {
         }
         return director;
     }
+
     public Director addDirector(Director director) {
         return directorDbStorage.addDirector(director);
     }
+
     public Director updateDirector(Director director) {
         Director updatedDirector;
         if (directorDbStorage.getDirectorById(director.getId()) == null) {
@@ -43,6 +45,7 @@ public class DirectorService {
         log.info("Режиссер с id: {} был обновлен.", director.getId());
         return updatedDirector;
     }
+
     public boolean deleteDirector(int id) {
         return directorDbStorage.deleteDirector(id);
     }
