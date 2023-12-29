@@ -29,6 +29,7 @@ public class DirectorDbStorage {
         List<Director> directors = jdbcTemplate.query(sql, new Object[]{id}, getDirectorMapper());
         return directors.isEmpty() ? null : directors.get(0);
     }
+
     public Director addDirector(Director director) {
         String sqlQuery = "INSERT INTO directors (name) VALUES (?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -40,11 +41,13 @@ public class DirectorDbStorage {
         director.setId(keyHolder.getKey().intValue());
         return getDirectorById(director.getId());
     }
+
     public Director updateDirector(Director director) {
         String sql = "UPDATE directors SET name = ? WHERE id = ?";
         jdbcTemplate.update(sql, director.getName(), director.getId());
         return getDirectorById(director.getId());
     }
+
     public boolean deleteDirector(int id) {
         String sql = "DELETE FROM directors WHERE id = ?";
         return jdbcTemplate.update(sql, id) > 0;

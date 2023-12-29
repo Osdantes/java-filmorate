@@ -227,34 +227,34 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
-        private Film makeFilm (ResultSet rs) throws SQLException {
-            long id = rs.getLong("id");
-            String name = rs.getString("name");
-            String description = rs.getString("description");
-            LocalDate releaseDate = rs.getDate("release_date").toLocalDate();
-            int duration = rs.getInt("duration");
-            List<Genre> genres = genreDbStorage.findGenreByFilmId(id);
+    private Film makeFilm (ResultSet rs) throws SQLException {
+        long id = rs.getLong("id");
+        String name = rs.getString("name");
+        String description = rs.getString("description");
+        LocalDate releaseDate = rs.getDate("release_date").toLocalDate();
+        int duration = rs.getInt("duration");
+        List<Genre> genres = genreDbStorage.findGenreByFilmId(id);
 
-            List<Director> directors = jdbcTemplate.query(
-                    "SELECT d.* FROM film_directors fd JOIN directors d ON fd.director_id = d.id WHERE fd.film_id = ?",
-                    new Object[]{id},
-                    (rsDirector, rowNum) -> new Director(rsDirector.getInt("id"), rsDirector.getString("name"))
-            );
+        List<Director> directors = jdbcTemplate.query(
+                "SELECT d.* FROM film_directors fd JOIN directors d ON fd.director_id = d.id WHERE fd.film_id = ?",
+                new Object[]{id},
+                (rsDirector, rowNum) -> new Director(rsDirector.getInt("id"), rsDirector.getString("name"))
+        );
 
-            Mpa mpa = null;
-            if (rs.getInt("mpa_code") > 0) {
-                mpa = mpaDbStorage.findPmaByCode(rs.getInt("mpa_code"));
-            }
-
-            return Film.builder()
-                    .id(id)
-                    .name(name)
-                    .description(description)
-                    .duration(duration)
-                    .releaseDate(releaseDate)
-                    .mpa(mpa)
-                    .directors(directors)
-                    .genres(genres)
-                    .build();
+        Mpa mpa = null;
+        if (rs.getInt("mpa_code") > 0) {
+            mpa = mpaDbStorage.findPmaByCode(rs.getInt("mpa_code"));
         }
+
+        return Film.builder()
+                .id(id)
+                .name(name)
+                .description(description)
+                .duration(duration)
+                .releaseDate(releaseDate)
+                .mpa(mpa)
+                .directors(directors)
+                .genres(genres)
+                .build();
     }
+}
