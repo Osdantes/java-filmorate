@@ -1,3 +1,4 @@
+
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.AllArgsConstructor;
@@ -16,3 +17,4 @@ public class Director {
     @Size(max = 200)
     private final String name;
 }
+
