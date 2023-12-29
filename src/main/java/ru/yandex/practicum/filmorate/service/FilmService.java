@@ -57,4 +57,9 @@ public class FilmService {
         log.info(String.format("Список %d самых популярных фильмов.", count));
         return likesDbStorage.getFilmsPopularList(count);
     }
+
+    public List<Film> getFilmsByDirector(int directorId, String sortBy) {
+        log.info(String.format("Список фильмов от режиссера c id = %d отсортированных по %s.", directorId, sortBy));
+        return filmStorage.getFilmsByDirector(directorId, sortBy);
+    }
 }

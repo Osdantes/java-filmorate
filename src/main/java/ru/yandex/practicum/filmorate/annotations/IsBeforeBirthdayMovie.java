@@ -10,7 +10,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = IsBeforeBirthdayMovieValidator.class)
 @Target(ElementType.FIELD)
-@Past
 public @interface IsBeforeBirthdayMovie {
     String message() default "Дата должна быть не раньше {value}";
 
