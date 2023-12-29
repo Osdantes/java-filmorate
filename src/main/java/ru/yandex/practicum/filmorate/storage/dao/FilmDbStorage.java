@@ -199,7 +199,7 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
-    private void updateFilmDirectors (Film film) {
+    private void updateFilmDirectors(Film film) {
         List<Integer> directorListIdFromDb = directorDbStorage.findDirectorsByFilmId(film.getId())
                 .stream()
                 .map(Director::getId)
@@ -227,7 +227,7 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
-    private Film makeFilm (ResultSet rs) throws SQLException {
+    private Film makeFilm(ResultSet rs) throws SQLException {
         long id = rs.getLong("id");
         String name = rs.getString("name");
         String description = rs.getString("description");
