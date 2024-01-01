@@ -12,4 +12,7 @@ public interface FilmStorage {
     public List<Film> getFilms();
 
     public Film getFilmById(Long id);
+
+    void deleteFilm(Integer id);
+
 }

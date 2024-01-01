@@ -32,7 +32,6 @@ public class FilmDbStorage implements FilmStorage {
     private final MpaDbStorage mpaDbStorage;
     private final GenreDbStorage genreDbStorage;
 
-
     private boolean isValid(Film film) {
         if (film.getReleaseDate() == null || film.getReleaseDate().isBefore(Constants.MIN_RELEASE_DATE)) {
             throw new ValidationException("Система поддерживает загрузку фильмов с датой выхода после "
@@ -181,6 +180,12 @@ public class FilmDbStorage implements FilmStorage {
                     .genres(genre)
                     .build();
         }
+    }
+
+    @Override
+    public void deleteFilm(Integer id) {
+        jdbcTemplate.update("delete from films where id=?", id);
+        log.info("Фильм удален id={}", id);
     }
 
     public List<Film> getFilmsPopularList(int count) {

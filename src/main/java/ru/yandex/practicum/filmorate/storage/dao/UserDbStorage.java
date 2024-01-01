@@ -93,6 +93,19 @@ public class UserDbStorage implements UserStorage {
                 .build();
     }
 
+    @Override
+    public boolean deleteUser(Integer id) {
+        final String sql = "delete from users where id = ?";
+        int result = jdbcTemplate.update(sql, id);
+        return result != 0;
+    }
+
+    @Override
+    public boolean checkUserReal(int id) {
+        String sql = "select * from users where id=?";
+        return !jdbcTemplate.query(sql, (rs, rowNum) -> makeUser(rs), id).isEmpty();
+    }
+
     public List<User> getLikesByFilmId(Film film) {
         String sql = "select u.* from likes_link ll join users u on ll.user_id = u.id where ll.film_id = ?";
         return jdbcTemplate.query(sql, (rs, rowNum) -> makeUser(rs), film.getId());
