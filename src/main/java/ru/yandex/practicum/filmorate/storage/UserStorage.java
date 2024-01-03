@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
@@ -14,7 +13,8 @@ public interface UserStorage {
 
     public User getUserById(Long id);
 
-    boolean deleteUser(Integer id);
+    void deleteUser(long id);
 
-    boolean checkUserReal(int id);
+    List<User> getFriendsByUserId(long userId);
+    boolean existsById(long id);
 }
