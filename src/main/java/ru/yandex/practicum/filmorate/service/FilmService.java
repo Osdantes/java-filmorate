@@ -57,4 +57,9 @@ public class FilmService {
         log.info(String.format("Список %d самых популярных фильмов.", count));
         return likesDbStorage.getFilmsPopularList(count);
     }
+
+    public String deleteFilm(Integer id) {
+            filmStorage.deleteFilm(id);
+        return String.format("Удаление фильма по id: {}:", id);
+    }
 }

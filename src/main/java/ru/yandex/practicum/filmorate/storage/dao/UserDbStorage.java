@@ -93,14 +93,23 @@ public class UserDbStorage implements UserStorage {
                 .build();
     }
 
+
+
+    public void deleteUser(long id) {
+        jdbcTemplate.update("delete from users where id = ?", id);
+    }
+
     public List<User> getLikesByFilmId(Film film) {
         String sql = "select u.* from likes_link ll join users u on ll.user_id = u.id where ll.film_id = ?";
         return jdbcTemplate.query(sql, (rs, rowNum) -> makeUser(rs), film.getId());
     }
 
     public List<User> getFriendsByUserId(long userId) {
-        String sql = "select u.* from friends_link fl join users u on fl.request_user_id = u.id " +
+        String sql = "select u.*" +
+                " from friends_link fl join users u " +
+                "on fl.request_user_id = u.id " +
                 "where fl.accept_user_id = ? and fl.status_code = 2";
+
         return jdbcTemplate.query(sql, (rs, rowNum) -> makeUser(rs), userId);
     }
 
@@ -111,6 +120,11 @@ public class UserDbStorage implements UserStorage {
                 "where fl1.accept_user_id = ? and fl2.accept_user_id = ?" +
                 "and fl1.status_code = 2 and fl2.status_code = 2";
         return jdbcTemplate.query(sql, (rs, rowNum) -> makeUser(rs), userId, otherId);
+    }
+
+    public boolean existsById(long id) {
+        Integer count = jdbcTemplate.queryForObject("select count(1) from users where id=?", Integer.class, id);
+        return count == 1;
     }
 
     private User makeUser(ResultSet rs) throws SQLException {

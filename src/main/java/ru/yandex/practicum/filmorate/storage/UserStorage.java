@@ -12,4 +12,10 @@ public interface UserStorage {
     public List<User> getUsers();
 
     public User getUserById(Long id);
+
+    void deleteUser(long id);
+
+    List<User> getFriendsByUserId(long userId);
+
+    boolean existsById(long id);
 }

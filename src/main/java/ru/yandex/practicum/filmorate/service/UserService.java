@@ -3,6 +3,8 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
+import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.storage.dao.FriendsDbStorage;
@@ -51,8 +53,17 @@ public class UserService {
         }
     }
 
+
     public List<User> getFriendsList(long userId) {
-        return friendsDbStorage.getFriendsList(userId);
+        if (!existsById(userId)) {
+            throw new DataNotFoundException("No user with id = " + userId + " in DB was found.");
+        }
+
+        return userStorage.getFriendsByUserId(userId);
+    }
+
+    public boolean existsById(long userId) {
+        return !isIncorrectId(userId) && userStorage.existsById(userId);
     }
 
     public List<User> getCommonFriendsList(long userId, long otherId) {
@@ -60,4 +71,16 @@ public class UserService {
     }
 
 
+    public String deleteUser(long id) {
+        if (userStorage.getUserById(id) != null) {
+            userStorage.deleteUser(id);
+            return String.format("Пользователь с id %s удален", id);
+        } else {
+            throw new UserNotFoundException("Пользователь не найден");
+        }
+    }
+
+    private boolean isIncorrectId(long id) {
+        return id <= 0;
+    }
 }
