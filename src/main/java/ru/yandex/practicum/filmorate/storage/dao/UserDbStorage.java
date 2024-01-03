@@ -121,6 +121,7 @@ public class UserDbStorage implements UserStorage {
                 "and fl1.status_code = 2 and fl2.status_code = 2";
         return jdbcTemplate.query(sql, (rs, rowNum) -> makeUser(rs), userId, otherId);
     }
+
     public boolean existsById(long id) {
         Integer count = jdbcTemplate.queryForObject("select count(1) from users where id=?", Integer.class, id);
         return count == 1;
