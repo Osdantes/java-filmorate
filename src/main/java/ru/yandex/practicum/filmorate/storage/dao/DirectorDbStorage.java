@@ -48,9 +48,9 @@ public class DirectorDbStorage {
         return getDirectorById(director.getId());
     }
 
-    public boolean deleteDirector(int id) {
+    public void deleteDirector(int id) {
         String sql = "DELETE FROM directors WHERE id = ?";
-        return jdbcTemplate.update(sql, id) > 0;
+        jdbcTemplate.update(sql, id);
     }
 
     public List<Director> findDirectorsByFilmId(Long filmId) {
@@ -59,6 +59,11 @@ public class DirectorDbStorage {
                 new Object[]{filmId},
                 (rs, rowNum) -> new Director(rs.getInt("id"), rs.getString("name"))
         );
+    }
+
+    public boolean existsById(int id) {
+        Integer count = jdbcTemplate.queryForObject("SELECT COUNT(1) FROM directors WHERE id = ?", Integer.class, id);
+        return count == 1;
     }
 
     private RowMapper<Director> getDirectorMapper() {
