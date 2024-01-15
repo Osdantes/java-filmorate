@@ -84,6 +84,7 @@ public class UserService {
         feedStorage.acceptFriendRequest(userId, friendId);
     }
 
+
     public List<User> getFriendsList(long userId) {
         if (!existsById(userId)) {
             throw new DataNotFoundException("No user with id = " + userId + " in DB was found.");
@@ -124,5 +125,17 @@ public class UserService {
             log.info("Changed blank user name to user login {}", user.getLogin());
             user.setName(user.getLogin());
         }
+
+    public String deleteUser(long id) {
+        if (userStorage.getUserById(id) != null) {
+            userStorage.deleteUser(id);
+            return String.format("Пользователь с id %s удален", id);
+        } else {
+            throw new UserNotFoundException("Пользователь не найден");
+        }
+    }
+
+    private boolean isIncorrectId(long id) {
+        return id <= 0;
     }
 }
