@@ -105,20 +105,18 @@ public class UserDbStorage implements UserStorage {
     }
 
     public List<User> getFriendsByUserId(long userId) {
-        String sql = "select u.*" +
-                " from friends_link fl join users u " +
-                "on fl.request_user_id = u.id " +
-                "where fl.accept_user_id = ? and fl.status_code = 2";
+        String sql = "select u.* " +
+                "from friends fl join users u on fl.friend_id = u.id " +
+                "where fl.user_id = ?";
 
         return jdbcTemplate.query(sql, (rs, rowNum) -> makeUser(rs), userId);
     }
 
     public List<User> getCommonFriendsByUsersIds(long userId, long otherId) {
         String sql = "select u.* " +
-                "from friends_link fl1 join friends_link fl2 on fl1.request_user_id = fl2.request_user_id " +
-                "join users u on fl2.request_user_id = u.id " +
-                "where fl1.accept_user_id = ? and fl2.accept_user_id = ?" +
-                "and fl1.status_code = 2 and fl2.status_code = 2";
+                "from friends fl1 join friends fl2 on fl1.friend_id = fl2.friend_id " +
+                "join users u on fl2.friend_id = u.id " +
+                "where fl1.user_id = ? and fl2.user_id = ?";
         return jdbcTemplate.query(sql, (rs, rowNum) -> makeUser(rs), userId, otherId);
     }
 

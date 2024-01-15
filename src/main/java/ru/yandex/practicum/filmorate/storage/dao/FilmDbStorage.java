@@ -140,7 +140,6 @@ public class FilmDbStorage implements FilmStorage {
                 .build();
     }
 
-    @Override
     public void deleteFilm(Integer id) {
         jdbcTemplate.update("delete from films where id=?", id);
         log.info("Фильм удален id={}", id);
@@ -203,6 +202,11 @@ public class FilmDbStorage implements FilmStorage {
                         film.getId(), genreId);
             }
         }
+    }
+
+    public boolean existsById(long id) {
+        Integer count = jdbcTemplate.queryForObject("select count(1) from films where id=?", Integer.class, id);
+        return count == 1;
     }
 
     public List<Film> getCommonFilms(long userId, long friendId) {

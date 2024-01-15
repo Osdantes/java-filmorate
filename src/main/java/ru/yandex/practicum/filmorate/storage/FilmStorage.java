@@ -18,4 +18,6 @@ public interface FilmStorage {
     List<Film> getFilmsByDirector(int directorId, String sortBy);
 
     void deleteFilm(Integer id);
+
+    boolean existsById(long id);
 }

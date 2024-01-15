@@ -1,6 +1,3 @@
-INSERT INTO friends_status_dic values(1,'неподтверждённая');
-INSERT INTO friends_status_dic values(2,'подтверждённая');
-
 INSERT INTO mpa_dic values(1, 'G');
 INSERT INTO mpa_dic values(2, 'PG');
 INSERT INTO mpa_dic values(3, 'PG-13');
