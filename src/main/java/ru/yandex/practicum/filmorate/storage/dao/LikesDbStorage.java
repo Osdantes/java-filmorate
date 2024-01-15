@@ -24,7 +24,7 @@ public class LikesDbStorage {
     }
 
     public void deleteLike(Film film, User user) {
-        String sql = "delete likes_link where user_id = ? and film_id = ?";
+        String sql = "delete from likes_link where user_id = ? and film_id = ?";
         jdbcTemplate.update(sql, user.getId(), film.getId());
         log.info(String.format("Удален лайк от пользователя %d фильму %d", user.getId(), film.getId()));
     }

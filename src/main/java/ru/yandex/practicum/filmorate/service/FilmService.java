@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.storage.dao.LikesDbStorage;
@@ -18,6 +19,7 @@ public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
     private final LikesDbStorage likesDbStorage;
+    private final FeedStorage feedStorage;
 
     public Film addFilm(Film film) {
         return filmStorage.addFilm(film);
@@ -41,6 +43,7 @@ public class FilmService {
         Film film = filmStorage.getFilmById(filmId);
         if (user != null && film != null) {
             likesDbStorage.addLike(film, user);
+            feedStorage.addLike(userId, filmId);
         }
     }
 
@@ -50,11 +53,35 @@ public class FilmService {
         Film film = filmStorage.getFilmById(filmId);
         if (user != null && film != null) {
             likesDbStorage.deleteLike(film, user);
+            feedStorage.deleteLike(userId, filmId);
         }
     }
 
     public List<Film> getFilmsPopularList(int count) {
         log.info(String.format("Список %d самых популярных фильмов.", count));
         return likesDbStorage.getFilmsPopularList(count);
+    }
+
+    public String deleteFilm(Integer id) {
+            filmStorage.deleteFilm(id);
+        return String.format("Удаление фильма по id: {}:", id);
+    }
+
+    public List<Film> getCommonFilms(long userId, long friendId) {
+        log.info("Список общих фильмов между двумя пользователями {} и {}", userId, friendId);
+        return filmStorage.getCommonFilms(userId, friendId);
+    }
+
+    public List<Film> getFilmsByDirector(int directorId, String sortBy) {
+        log.info(String.format("Список фильмов от режиссера c id = %d отсортированных по %s.", directorId, sortBy));
+        return filmStorage.getFilmsByDirector(directorId, sortBy);
+    }
+
+    public boolean existsById(long filmId) {
+        return !isIncorrectId(filmId) && filmStorage.existsById(filmId);
+    }
+
+    private boolean isIncorrectId(long id) {
+        return id <= 0;
     }
 }
