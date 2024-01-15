@@ -199,6 +199,17 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
+    public List<Film> getCommonFilms(long userId, long friendId) {
+        final String sql = "select f.* " +
+                "from films f " +
+                "join likes_link l1 on f.id = l1.film_id " +
+                "join likes_link l2 on f.id = l2.film_id " +
+                "where l1.user_id = ? " +
+                "and l2.user_id = ? " +
+                "and l1.user_id <> l2.user_id";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs), userId, friendId);
+    }
+
     private void updateFilmDirectors(Film film) {
         List<Integer> directorListIdFromDb = directorDbStorage.findDirectorsByFilmId(film.getId())
                 .stream()
