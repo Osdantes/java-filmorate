@@ -58,6 +58,11 @@ public class FilmService {
         return likesDbStorage.getFilmsPopularList(count);
     }
 
+    public String deleteFilm(Integer id) {
+            filmStorage.deleteFilm(id);
+        return String.format("Удаление фильма по id: {}:", id);
+    }
+
     public List<Film> getCommonFilms(long userId, long friendId) {
         log.info("Список общих фильмов между двумя пользователями {} и {}", userId, friendId);
         return filmStorage.getCommonFilms(userId, friendId);

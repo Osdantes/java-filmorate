@@ -140,6 +140,12 @@ public class FilmDbStorage implements FilmStorage {
                 .build();
     }
 
+    @Override
+    public void deleteFilm(Integer id) {
+        jdbcTemplate.update("delete from films where id=?", id);
+        log.info("Фильм удален id={}", id);
+    }
+
     public List<Film> getFilmsPopularList(int count) {
         String sql = "select f.* from films f left join " +
                 "(select ll.film_id, count(ll.user_id) cnt from likes_link ll group by ll.film_id) l " +
