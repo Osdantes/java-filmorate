@@ -125,8 +125,4 @@ public class UserService {
             log.info("Changed blank user name to user login {}", user.getLogin());
             user.setName(user.getLogin());
         }
-
-    private boolean isIncorrectId(long id) {
-        return id <= 0;
-    }
 }
