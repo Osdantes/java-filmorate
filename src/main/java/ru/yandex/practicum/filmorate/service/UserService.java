@@ -126,15 +126,6 @@ public class UserService {
             user.setName(user.getLogin());
         }
 
-    public String deleteUser(long id) {
-        if (userStorage.getUserById(id) != null) {
-            userStorage.deleteUser(id);
-            return String.format("Пользователь с id %s удален", id);
-        } else {
-            throw new UserNotFoundException("Пользователь не найден");
-        }
-    }
-
     private boolean isIncorrectId(long id) {
         return id <= 0;
     }
