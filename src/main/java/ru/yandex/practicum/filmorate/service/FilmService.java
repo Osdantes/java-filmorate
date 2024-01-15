@@ -63,3 +63,13 @@ public class FilmService {
         return String.format("Удаление фильма по id: {}:", id);
     }
 }
+    public List<Film> getCommonFilms(long userId, long friendId) {
+        log.info("Список общих фильмов между двумя пользователями {} и {}", userId, friendId);
+        return filmStorage.getCommonFilms(userId, friendId);
+    }
+
+    public List<Film> getFilmsByDirector(int directorId, String sortBy) {
+        log.info(String.format("Список фильмов от режиссера c id = %d отсортированных по %s.", directorId, sortBy));
+        return filmStorage.getFilmsByDirector(directorId, sortBy);
+    }
+}
