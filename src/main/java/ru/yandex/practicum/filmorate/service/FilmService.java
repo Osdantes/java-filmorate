@@ -62,4 +62,9 @@ public class FilmService {
         log.info("Список общих фильмов между двумя пользователями {} и {}", userId, friendId);
         return filmStorage.getCommonFilms(userId, friendId);
     }
+  
+    public List<Film> getFilmsByDirector(int directorId, String sortBy) {
+        log.info(String.format("Список фильмов от режиссера c id = %d отсортированных по %s.", directorId, sortBy));
+        return filmStorage.getFilmsByDirector(directorId, sortBy);
+    }
 }
