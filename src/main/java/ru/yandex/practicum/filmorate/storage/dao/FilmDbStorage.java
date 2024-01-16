@@ -140,6 +140,11 @@ public class FilmDbStorage implements FilmStorage {
                 .build();
     }
 
+    public void deleteFilm(Integer id) {
+        jdbcTemplate.update("delete from films where id=?", id);
+        log.info("Фильм удален id={}", id);
+    }
+
     public List<Film> getFilmsPopularList(int count) {
         String sql = "select f.* from films f left join " +
                 "(select ll.film_id, count(ll.user_id) cnt from likes_link ll group by ll.film_id) l " +
@@ -197,6 +202,22 @@ public class FilmDbStorage implements FilmStorage {
                         film.getId(), genreId);
             }
         }
+    }
+
+    public boolean existsById(long id) {
+        Integer count = jdbcTemplate.queryForObject("select count(1) from films where id=?", Integer.class, id);
+        return count == 1;
+    }
+
+    public List<Film> getCommonFilms(long userId, long friendId) {
+        final String sql = "select f.* " +
+                "from films f " +
+                "join likes_link l1 on f.id = l1.film_id " +
+                "join likes_link l2 on f.id = l2.film_id " +
+                "where l1.user_id = ? " +
+                "and l2.user_id = ? " +
+                "and l1.user_id <> l2.user_id";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs), userId, friendId);
     }
 
     private void updateFilmDirectors(Film film) {
