@@ -227,6 +227,43 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
+    public List<Film> searchFilms(String query, String by) {
+        boolean useTitle = by.contains("title");
+        boolean useDirector = by.contains("director");
+
+        String sql = "SELECT f.*, COUNT(ll.user_id) AS likes_count " +
+                "FROM films AS f " +
+                "LEFT JOIN likes_link AS ll ON f.id = ll.film_id ";
+
+        // Поиск
+        if(useTitle && useDirector) {
+            sql += "LEFT JOIN film_directors AS fd ON f.id = fd.film_id " +
+                    "LEFT JOIN directors AS d ON fd.director_id = d.id " +
+                    "WHERE (LOWER(f.name) LIKE LOWER(?) OR LOWER(d.name) LIKE LOWER(?)) ";
+        } else if(useDirector) {
+            sql += "JOIN film_directors AS fd ON f.id = fd.film_id " +
+                    "JOIN directors AS d ON fd.director_id = d.id " +
+                    "WHERE LOWER(d.name) LIKE LOWER(?)";
+        } else if(useTitle) {
+            sql += "WHERE LOWER(f.name) LIKE LOWER(?)";
+        }
+
+        // Группируем результаты и сортируем по популярности
+        sql += "GROUP BY f.id " +
+                "ORDER BY likes_count DESC";
+
+        return jdbcTemplate.query(sql, preparedStatement -> {
+            if (useTitle && useDirector) {
+                preparedStatement.setString(1, "%" + query + "%");
+                preparedStatement.setString(2, "%" + query + "%");
+            } else if (useDirector) {
+                preparedStatement.setString(1, "%" + query + "%");
+            } else if (useTitle) {
+                preparedStatement.setString(1, "%" + query + "%");
+            }
+        }, (resultSet, rowNum) -> makeFilm(resultSet));
+    }
+
     private Film makeFilm(ResultSet rs) throws SQLException {
         long id = rs.getLong("id");
         String name = rs.getString("name");
@@ -238,7 +275,8 @@ public class FilmDbStorage implements FilmStorage {
         List<Director> directors = jdbcTemplate.query(
                 "SELECT d.* FROM film_directors fd JOIN directors d ON fd.director_id = d.id WHERE fd.film_id = ?",
                 new Object[]{id},
-                (rsDirector, rowNum) -> new Director(rsDirector.getInt("id"), rsDirector.getString("name"))
+                (rsDirector, rowNum) -> new Director(rsDirector.getInt("id"),
+                        rsDirector.getString("name"))
         );
 
         Mpa mpa = null;
