@@ -257,15 +257,15 @@ public class FilmDbStorage implements FilmStorage {
                 "LEFT JOIN likes_link AS ll ON f.id = ll.film_id ";
 
         // Поиск
-        if(useTitle && useDirector) {
+        if (useTitle && useDirector) {
             sql += "LEFT JOIN film_directors AS fd ON f.id = fd.film_id " +
                     "LEFT JOIN directors AS d ON fd.director_id = d.id " +
                     "WHERE (LOWER(f.name) LIKE LOWER(?) OR LOWER(d.name) LIKE LOWER(?)) ";
-        } else if(useDirector) {
+        } else if (useDirector) {
             sql += "JOIN film_directors AS fd ON f.id = fd.film_id " +
                     "JOIN directors AS d ON fd.director_id = d.id " +
                     "WHERE LOWER(d.name) LIKE LOWER(?)";
-        } else if(useTitle) {
+        } else if (useTitle) {
             sql += "WHERE LOWER(f.name) LIKE LOWER(?)";
         }
 
