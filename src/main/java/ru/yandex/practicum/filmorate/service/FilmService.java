@@ -77,6 +77,11 @@ public class FilmService {
         return filmStorage.getFilmsByDirector(directorId, sortBy);
     }
 
+    public List<Film> searchFilms(String query, String by) {
+        log.info(String.format("Список фильмов с подстрокой query = %s по популярности.", query));
+        return filmStorage.searchFilms(query, by);
+    }
+
     public boolean existsById(long filmId) {
         return !isIncorrectId(filmId) && filmStorage.existsById(filmId);
     }

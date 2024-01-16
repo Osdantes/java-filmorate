@@ -17,6 +17,8 @@ public interface FilmStorage {
 
     List<Film> getFilmsByDirector(int directorId, String sortBy);
 
+    List<Film> searchFilms(String query, String by);
+
     void deleteFilm(Integer id);
 
     boolean existsById(long id);
