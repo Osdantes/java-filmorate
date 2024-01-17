@@ -89,32 +89,4 @@ public class FilmService {
     private boolean isIncorrectId(long id) {
         return id <= 0;
     }
-
-    public String deleteFilm(Integer id) {
-            filmStorage.deleteFilm(id);
-        return String.format("Удаление фильма по id: {}:", id);
-    }
-
-    public List<Film> getCommonFilms(long userId, long friendId) {
-        log.info("Список общих фильмов между двумя пользователями {} и {}", userId, friendId);
-        return filmStorage.getCommonFilms(userId, friendId);
-    }
-
-    public List<Film> getFilmsByDirector(int directorId, String sortBy) {
-        log.info(String.format("Список фильмов от режиссера c id = %d отсортированных по %s.", directorId, sortBy));
-        return filmStorage.getFilmsByDirector(directorId, sortBy);
-    }
-
-    public List<Film> searchFilms(String query, String by) {
-        log.info(String.format("Список фильмов с подстрокой query = %s по популярности.", query));
-        return filmStorage.searchFilms(query, by);
-    }
-
-    public boolean existsById(long filmId) {
-        return !isIncorrectId(filmId) && filmStorage.existsById(filmId);
-    }
-
-    private boolean isIncorrectId(long id) {
-        return id <= 0;
-    }
 }
