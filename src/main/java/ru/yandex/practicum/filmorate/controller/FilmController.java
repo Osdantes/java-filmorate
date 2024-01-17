@@ -74,26 +74,4 @@ public class FilmController {
             @RequestParam(defaultValue = "title") String by) {
         return filmService.searchFilms(query, by);
     }
-
-    @DeleteMapping("/{filmId}")
-    public String deleteFilm(@PathVariable Integer filmId) {
-        return filmService.deleteFilm(filmId);
-    }
-
-    @GetMapping("/common")
-    public List<Film> getCommonFilms(@RequestParam long userId, @RequestParam long friendId) {
-        return filmService.getCommonFilms(userId, friendId);
-    }
-
-    @GetMapping("/director/{directorId}")
-    public List<Film> getFilmsByDirector(@PathVariable int directorId, @RequestParam(required = false) String sortBy) {
-        return filmService.getFilmsByDirector(directorId, sortBy);
-    }
-
-    @GetMapping("/search{query}")
-    public List<Film> searchFilms(
-            @RequestParam String query,
-            @RequestParam(defaultValue = "title") String by) {
-        return filmService.searchFilms(query, by);
-    }
 }
