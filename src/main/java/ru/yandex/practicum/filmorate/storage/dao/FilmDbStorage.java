@@ -140,6 +140,11 @@ public class FilmDbStorage implements FilmStorage {
                 .build();
     }
 
+    public void deleteFilm(Integer id) {
+        jdbcTemplate.update("delete from films where id=?", id);
+        log.info("Фильм удален id={}", id);
+    }
+
     public List<Film> getFilmsPopularList(int count) {
         String sql = "select f.* from films f left join " +
                 "(select ll.film_id, count(ll.user_id) cnt from likes_link ll group by ll.film_id) l " +
@@ -214,6 +219,22 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
+    public boolean existsById(long id) {
+        Integer count = jdbcTemplate.queryForObject("select count(1) from films where id=?", Integer.class, id);
+        return count == 1;
+    }
+
+    public List<Film> getCommonFilms(long userId, long friendId) {
+        final String sql = "select f.* " +
+                "from films f " +
+                "join likes_link l1 on f.id = l1.film_id " +
+                "join likes_link l2 on f.id = l2.film_id " +
+                "where l1.user_id = ? " +
+                "and l2.user_id = ? " +
+                "and l1.user_id <> l2.user_id";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs), userId, friendId);
+    }
+
     private void updateFilmDirectors(Film film) {
         List<Integer> directorListIdFromDb = directorDbStorage.findDirectorsByFilmId(film.getId())
                 .stream()
@@ -242,6 +263,43 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
+    public List<Film> searchFilms(String query, String by) {
+        boolean useTitle = by.contains("title");
+        boolean useDirector = by.contains("director");
+
+        String sql = "SELECT f.*, COUNT(ll.user_id) AS likes_count " +
+                "FROM films AS f " +
+                "LEFT JOIN likes_link AS ll ON f.id = ll.film_id ";
+
+        // Поиск
+        if (useTitle && useDirector) {
+            sql += "LEFT JOIN film_directors AS fd ON f.id = fd.film_id " +
+                    "LEFT JOIN directors AS d ON fd.director_id = d.id " +
+                    "WHERE (LOWER(f.name) LIKE LOWER(?) OR LOWER(d.name) LIKE LOWER(?)) ";
+        } else if (useDirector) {
+            sql += "JOIN film_directors AS fd ON f.id = fd.film_id " +
+                    "JOIN directors AS d ON fd.director_id = d.id " +
+                    "WHERE LOWER(d.name) LIKE LOWER(?)";
+        } else if (useTitle) {
+            sql += "WHERE LOWER(f.name) LIKE LOWER(?)";
+        }
+
+        // Группируем результаты и сортируем по популярности
+        sql += "GROUP BY f.id " +
+                "ORDER BY likes_count DESC";
+
+        return jdbcTemplate.query(sql, preparedStatement -> {
+            if (useTitle && useDirector) {
+                preparedStatement.setString(1, "%" + query + "%");
+                preparedStatement.setString(2, "%" + query + "%");
+            } else if (useDirector) {
+                preparedStatement.setString(1, "%" + query + "%");
+            } else if (useTitle) {
+                preparedStatement.setString(1, "%" + query + "%");
+            }
+        }, (resultSet, rowNum) -> makeFilm(resultSet));
+    }
+
     private Film makeFilm(ResultSet rs) throws SQLException {
         long id = rs.getLong("id");
         String name = rs.getString("name");
@@ -253,7 +311,8 @@ public class FilmDbStorage implements FilmStorage {
         List<Director> directors = jdbcTemplate.query(
                 "SELECT d.* FROM film_directors fd JOIN directors d ON fd.director_id = d.id WHERE fd.film_id = ?",
                 new Object[]{id},
-                (rsDirector, rowNum) -> new Director(rsDirector.getInt("id"), rsDirector.getString("name"))
+                (rsDirector, rowNum) -> new Director(rsDirector.getInt("id"),
+                        rsDirector.getString("name"))
         );
 
         Mpa mpa = null;

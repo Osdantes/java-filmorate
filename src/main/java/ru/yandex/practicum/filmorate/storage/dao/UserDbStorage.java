@@ -93,24 +93,36 @@ public class UserDbStorage implements UserStorage {
                 .build();
     }
 
+
+
+    public void deleteUser(long id) {
+        jdbcTemplate.update("delete from users where id = ?", id);
+    }
+
     public List<User> getLikesByFilmId(Film film) {
         String sql = "select u.* from likes_link ll join users u on ll.user_id = u.id where ll.film_id = ?";
         return jdbcTemplate.query(sql, (rs, rowNum) -> makeUser(rs), film.getId());
     }
 
     public List<User> getFriendsByUserId(long userId) {
-        String sql = "select u.* from friends_link fl join users u on fl.request_user_id = u.id " +
-                "where fl.accept_user_id = ? and fl.status_code = 2";
+        String sql = "select u.* " +
+                "from friends fl join users u on fl.friend_id = u.id " +
+                "where fl.user_id = ?";
+
         return jdbcTemplate.query(sql, (rs, rowNum) -> makeUser(rs), userId);
     }
 
     public List<User> getCommonFriendsByUsersIds(long userId, long otherId) {
         String sql = "select u.* " +
-                "from friends_link fl1 join friends_link fl2 on fl1.request_user_id = fl2.request_user_id " +
-                "join users u on fl2.request_user_id = u.id " +
-                "where fl1.accept_user_id = ? and fl2.accept_user_id = ?" +
-                "and fl1.status_code = 2 and fl2.status_code = 2";
+                "from friends fl1 join friends fl2 on fl1.friend_id = fl2.friend_id " +
+                "join users u on fl2.friend_id = u.id " +
+                "where fl1.user_id = ? and fl2.user_id = ?";
         return jdbcTemplate.query(sql, (rs, rowNum) -> makeUser(rs), userId, otherId);
+    }
+
+    public boolean existsById(long id) {
+        Integer count = jdbcTemplate.queryForObject("select count(1) from users where id=?", Integer.class, id);
+        return count == 1;
     }
 
     private User makeUser(ResultSet rs) throws SQLException {
