@@ -57,9 +57,9 @@ public class FilmService {
         }
     }
 
-    public List<Film> getFilmsPopularList(int count) {
+    public List<Film> getFilmsPopularList(Integer count, Integer genreId, Integer year) {
         log.info(String.format("Список %d самых популярных фильмов.", count));
-        return likesDbStorage.getFilmsPopularList(count);
+        return likesDbStorage.getFilmsPopularList(count, genreId, year);
     }
 
     public String deleteFilm(Integer id) {
