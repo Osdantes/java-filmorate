@@ -140,18 +140,54 @@ public class FilmDbStorage implements FilmStorage {
                 .build();
     }
 
+
+    public List<Film> getFilmsPopularList(Integer count, Integer genreId, Integer year) {
+        if (genreId > 0 && year == -1) {
+            String sqlQuery = "SELECT f.*\n" +
+                    "FROM genre_link gl JOIN films f ON gl.film_id = f.id\n" +
+                    "LEFT JOIN likes_link ll ON f.id = ll.film_id\n" +
+                    "WHERE gl.genre_code = ? \n" +
+                    "GROUP BY f.id\n" +
+                    "ORDER BY COUNT(ll.user_id) DESC\n" +
+                    "limit ?";
+            log.info(String.format("Вывод топ %s фильмов с жанром %s", count, genreId));
+            return jdbcTemplate.query(sqlQuery, (rs, rowNum) -> makeFilm(rs), genreId, count);
+        } else if (genreId == -1 && year > 0) {
+            String sqlQuery = "SELECT f.*\n" +
+                    "FROM films f LEFT JOIN likes_link ll ON f.id = ll.film_id\n" +
+                    "WHERE EXTRACT(YEAR FROM f.release_date) = ? \n" +
+                    "GROUP BY f.id\n" +
+                    "ORDER BY COUNT(ll.user_id)\n" +
+                    "limit ?";
+            log.info(String.format("Вывод топ %s фильмов %s года", count, year));
+            List<Film> films = jdbcTemplate.query(sqlQuery, (rs, rowNum) -> makeFilm(rs), year, count);
+            return jdbcTemplate.query(sqlQuery, (rs, rowNum) -> makeFilm(rs), year, count);
+        } else if (genreId > 0 && year > 0) {
+            String sqlQuery = "SELECT f.*\n" +
+                    "FROM films f JOIN genre_link gl ON f.id = gl.film_id\n" +
+                    "LEFT JOIN likes_link ll ON f.id = ll.film_id\n" +
+                    "WHERE gl.genre_code = ? \n" +
+                    "AND EXTRACT(YEAR FROM f.release_date) = ? \n" +
+                    "GROUP BY f.id\n" +
+                    "ORDER BY COUNT(ll.user_id) DESC\n" +
+                    "limit ?";
+            log.info(String.format("Вывод топ %s фильмов %s года и жанра %s", count, year, genreId));
+            return jdbcTemplate.query(sqlQuery, (rs, rowNum) -> makeFilm(rs), genreId, year, count);
+        } else {
+            String sqlQuery = "SELECT f.*\n" +
+                    "FROM films f\n" +
+                    "LEFT JOIN likes_link ll ON f.id = ll.film_id\n" +
+                    "GROUP BY f.id, f.name\n" +
+                    "ORDER BY COUNT(ll.user_id) DESC\n" +
+                    "limit ?";
+            log.info(String.format("Вывод топ %s фильмов без параметров", count));
+            return jdbcTemplate.query(sqlQuery, (rs, rowNum) -> makeFilm(rs), count);
+        }
+    }
+
     public void deleteFilm(Integer id) {
         jdbcTemplate.update("delete from films where id=?", id);
         log.info("Фильм удален id={}", id);
-    }
-
-    public List<Film> getFilmsPopularList(int count) {
-        String sql = "select f.* from films f left join " +
-                "(select ll.film_id, count(ll.user_id) cnt from likes_link ll group by ll.film_id) l " +
-                "on f.id = l.film_id " +
-                "order by l.cnt desc " +
-                "limit ?";
-        return jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs), count);
     }
 
     public List<Film> getFilmsByDirector(int directorId, String sortBy) {
@@ -174,34 +210,6 @@ public class FilmDbStorage implements FilmStorage {
         }
 
         return jdbcTemplate.query(sql, new Object[]{directorId}, (rs, rowNum) -> makeFilm(rs));
-    }
-
-    private void updateFilmGenres(Film film) {
-        List<Integer> genreListIdFromDb = genreDbStorage.findGenreByFilmId(film.getId())
-                .stream()
-                .map(Genre::getId)
-                .distinct()
-                .collect(Collectors.toList());
-        List<Integer> genreListIdFromFilm = film.getGenres() == null ? Collections.emptyList() :
-                film.getGenres()
-                        .stream()
-                        .map(Genre::getId)
-                        .distinct()
-                        .collect(Collectors.toList());
-
-        for (Integer genreId : genreListIdFromFilm) {
-            if (!genreListIdFromDb.contains(genreId)) {
-                jdbcTemplate.update("INSERT INTO genre_link(film_id, genre_code) VALUES (?, ?)",
-                        film.getId(), genreId);
-            }
-        }
-
-        for (Integer genreId : genreListIdFromDb) {
-            if (!genreListIdFromFilm.contains(genreId)) {
-                jdbcTemplate.update("DELETE FROM genre_link WHERE film_id = ? AND genre_code = ?",
-                        film.getId(), genreId);
-            }
-        }
     }
 
     public boolean existsById(long id) {
@@ -283,6 +291,34 @@ public class FilmDbStorage implements FilmStorage {
                 preparedStatement.setString(1, "%" + query + "%");
             }
         }, (resultSet, rowNum) -> makeFilm(resultSet));
+    }
+
+    private void updateFilmGenres(Film film) {
+        List<Integer> genreListIdFromDb = genreDbStorage.findGenreByFilmId(film.getId())
+                .stream()
+                .map(Genre::getId)
+                .distinct()
+                .collect(Collectors.toList());
+        List<Integer> genreListIdFromFilm = film.getGenres() == null ? Collections.emptyList() :
+                film.getGenres()
+                        .stream()
+                        .map(Genre::getId)
+                        .distinct()
+                        .collect(Collectors.toList());
+
+        for (Integer genreId : genreListIdFromFilm) {
+            if (!genreListIdFromDb.contains(genreId)) {
+                jdbcTemplate.update("INSERT INTO genre_link(film_id, genre_code) VALUES (?, ?)",
+                        film.getId(), genreId);
+            }
+        }
+
+        for (Integer genreId : genreListIdFromDb) {
+            if (!genreListIdFromFilm.contains(genreId)) {
+                jdbcTemplate.update("DELETE FROM genre_link WHERE film_id = ? AND genre_code = ?",
+                        film.getId(), genreId);
+            }
+        }
     }
 
     private Film makeFilm(ResultSet rs) throws SQLException {

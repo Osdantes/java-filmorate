@@ -33,7 +33,7 @@ public class LikesDbStorage {
         return userDbStorage.getLikesByFilmId(film);
     }
 
-    public List<Film> getFilmsPopularList(int count) {
-        return filmDbStorage.getFilmsPopularList(count);
+    public List<Film> getFilmsPopularList(int count, int genreId, int year) {
+        return filmDbStorage.getFilmsPopularList(count, genreId, year);
     }
 }
