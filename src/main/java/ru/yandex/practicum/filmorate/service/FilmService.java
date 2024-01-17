@@ -62,9 +62,4 @@ public class FilmService {
         log.info(String.format("Список фильмов от режиссера c id = %d отсортированных по %s.", directorId, sortBy));
         return filmStorage.getFilmsByDirector(directorId, sortBy);
     }
-
-    public List<Film> getFilmsByDirector(int directorId, String sortBy) {
-        log.info(String.format("Список фильмов от режиссера c id = %d отсортированных по %s.", directorId, sortBy));
-        return filmStorage.getFilmsByDirector(directorId, sortBy);
-    }
 }
