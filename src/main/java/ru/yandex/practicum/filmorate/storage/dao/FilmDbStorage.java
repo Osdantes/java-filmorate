@@ -305,6 +305,34 @@ public class FilmDbStorage implements FilmStorage {
         }, (resultSet, rowNum) -> makeFilm(resultSet));
     }
 
+    private void updateFilmGenres(Film film) {
+        List<Integer> genreListIdFromDb = genreDbStorage.findGenreByFilmId(film.getId())
+                .stream()
+                .map(Genre::getId)
+                .distinct()
+                .collect(Collectors.toList());
+        List<Integer> genreListIdFromFilm = film.getGenres() == null ? Collections.emptyList() :
+                film.getGenres()
+                        .stream()
+                        .map(Genre::getId)
+                        .distinct()
+                        .collect(Collectors.toList());
+
+        for (Integer genreId : genreListIdFromFilm) {
+            if (!genreListIdFromDb.contains(genreId)) {
+                jdbcTemplate.update("INSERT INTO genre_link(film_id, genre_code) VALUES (?, ?)",
+                        film.getId(), genreId);
+            }
+        }
+
+        for (Integer genreId : genreListIdFromDb) {
+            if (!genreListIdFromFilm.contains(genreId)) {
+                jdbcTemplate.update("DELETE FROM genre_link WHERE film_id = ? AND genre_code = ?",
+                        film.getId(), genreId);
+            }
+        }
+    }
+
     private Film makeFilm(ResultSet rs) throws SQLException {
         long id = rs.getLong("id");
         String name = rs.getString("name");
