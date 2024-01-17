@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -10,6 +11,7 @@ import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.storage.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.FriendStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.dao.FilmDbStorage;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -19,6 +21,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class UserService {
     private final UserStorage userStorage;
+    private final FilmDbStorage filmDbStorage;
     private final FeedStorage feedStorage;
     private final FriendStorage friendStorage;
 
@@ -112,6 +115,10 @@ public class UserService {
 
     private boolean isIncorrectId(long id) {
         return id <= 0;
+    }
+
+    public List<Film> getRecommendations(long userId) {
+        return filmDbStorage.getRecommendations(userId);
     }
 
     private boolean isNotValid(User user) {
