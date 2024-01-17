@@ -3,8 +3,10 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.dao.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.dao.FriendsDbStorage;
 
 import java.util.*;
@@ -15,6 +17,7 @@ import java.util.*;
 public class UserService {
     private final UserStorage userStorage;
     private final FriendsDbStorage friendsDbStorage;
+    private final FilmDbStorage filmDbStorage;
 
     public User addUser(User user) {
         return userStorage.addUser(user);
@@ -59,5 +62,7 @@ public class UserService {
         return friendsDbStorage.getCommonFriendsList(userId, otherId);
     }
 
-
+    public List<Film> getRecommendations(long userId) {
+        return filmDbStorage.getRecommendations(userId);
+    }
 }

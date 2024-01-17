@@ -171,6 +171,21 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.query(sql, new Object[]{directorId}, (rs, rowNum) -> makeFilm(rs));
     }
 
+    @Override
+    public List<Film> getRecommendations(long userId) {
+        String sql = "select distinct f.* " +
+                "from likes_link l " +
+                "join films f on l.film_id = f.id " +
+                "where l.user_id <> ?1 " +
+                "and l.film_id not in ( " +
+                "    select f.id " +
+                "    from films f " +
+                "    join likes_link l on f.id = l.film_id " +
+                "    where l.user_id = ?1 " +
+                ");";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs), userId);
+    }
+
     private void updateFilmGenres(Film film) {
         List<Integer> genreListIdFromDb = genreDbStorage.findGenreByFilmId(film.getId())
                 .stream()
