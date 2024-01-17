@@ -227,34 +227,6 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs), userId);
     }
 
-    private void updateFilmGenres(Film film) {
-        List<Integer> genreListIdFromDb = genreDbStorage.findGenreByFilmId(film.getId())
-                .stream()
-                .map(Genre::getId)
-                .distinct()
-                .collect(Collectors.toList());
-        List<Integer> genreListIdFromFilm = film.getGenres() == null ? Collections.emptyList() :
-                film.getGenres()
-                        .stream()
-                        .map(Genre::getId)
-                        .distinct()
-                        .collect(Collectors.toList());
-
-        for (Integer genreId : genreListIdFromFilm) {
-            if (!genreListIdFromDb.contains(genreId)) {
-                jdbcTemplate.update("INSERT INTO genre_link(film_id, genre_code) VALUES (?, ?)",
-                        film.getId(), genreId);
-            }
-        }
-
-        for (Integer genreId : genreListIdFromDb) {
-            if (!genreListIdFromFilm.contains(genreId)) {
-                jdbcTemplate.update("DELETE FROM genre_link WHERE film_id = ? AND genre_code = ?",
-                        film.getId(), genreId);
-            }
-        }
-    }
-
     public boolean existsById(long id) {
         Integer count = jdbcTemplate.queryForObject("select count(1) from films where id=?", Integer.class, id);
         return count == 1;
