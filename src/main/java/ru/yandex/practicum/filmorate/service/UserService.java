@@ -12,7 +12,6 @@ import ru.yandex.practicum.filmorate.storage.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.FriendStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.storage.dao.FilmDbStorage;
-import ru.yandex.practicum.filmorate.storage.dao.FriendsDbStorage;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -22,7 +21,6 @@ import java.util.*;
 @RequiredArgsConstructor
 public class UserService {
     private final UserStorage userStorage;
-    private final FriendsDbStorage friendsDbStorage;
     private final FilmDbStorage filmDbStorage;
     private final FeedStorage feedStorage;
     private final FriendStorage friendStorage;
