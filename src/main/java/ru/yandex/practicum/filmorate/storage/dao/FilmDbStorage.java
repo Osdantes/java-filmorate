@@ -183,18 +183,6 @@ public class FilmDbStorage implements FilmStorage {
             log.info(String.format("Вывод топ %s фильмов без параметров", count));
             return jdbcTemplate.query(sqlQuery, (rs, rowNum) -> makeFilm(rs), count);
         }
-        List<Director> directors = directorDbStorage.findDirectorsByFilmId(id);
-
-        return Film.builder()
-                .id(id)
-                .name(filmRows.getString("name"))
-                .description(filmRows.getString("description"))
-                .duration(filmRows.getInt("duration"))
-                .releaseDate(filmRows.getDate("release_date").toLocalDate())
-                .mpa(mpa)
-                .directors(directors)
-                .genres(genres)
-                .build();
     }
 
     public void deleteFilm(Integer id) {
