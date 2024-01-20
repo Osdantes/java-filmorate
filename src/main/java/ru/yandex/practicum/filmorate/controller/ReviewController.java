@@ -16,15 +16,13 @@ import ru.yandex.practicum.filmorate.service.ReviewService;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/reviews")
 @RequiredArgsConstructor
 @Slf4j
 public class ReviewController {
-    private static final String DUMMY_PARAM_VALUE = "-1";
-    private static final String DEFAULT_COUNT = "10";
-
     private final ReviewService reviewService;
 
     @PostMapping
@@ -52,9 +50,12 @@ public class ReviewController {
     }
 
     @GetMapping
-    public List<Review> getReviewsByFilmId(@RequestParam(defaultValue = DUMMY_PARAM_VALUE) long filmId,
-                                           @RequestParam(defaultValue = DEFAULT_COUNT) int count) {
+    public List<Review> getReviewsByFilmId(@RequestParam(required = false) Long filmId,
+                                           @RequestParam(defaultValue = "10") int count) {
         log.info("Requested {} reviews for film {}", count, filmId);
+        if (filmId == null) {
+            return reviewService.getAllReviews();
+        }
         return reviewService.getReviewsByFilmId(filmId, count);
     }
 

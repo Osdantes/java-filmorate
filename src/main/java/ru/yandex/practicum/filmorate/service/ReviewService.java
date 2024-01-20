@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.FeedStorage;
@@ -16,7 +17,6 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 public class ReviewService {
-    private static final int DUMMY_PARAM_VALUE = -1;
     private final ReviewStorage reviewStorage;
     private final ReviewLikeStorage reviewLikeStorage;
     private final FeedStorage feedStorage;
@@ -66,18 +66,18 @@ public class ReviewService {
         }
         Optional<Review> reviewOpt = reviewStorage.getReviewById(id);
 
-        return reviewOpt.orElseThrow(() -> new DataNotFoundException("No review with id = " + id + " in DB was found."));
+        return reviewOpt.orElseThrow(() -> new DataNotFoundException("No review w\nith id = " + id + " in DB was found."));
     }
-
     public List<Review> getAllReviews() {
         return reviewStorage.getAllReviews();
     }
 
     public List<Review> getReviewsByFilmId(Long filmId, int count) {
-        if (filmId == DUMMY_PARAM_VALUE || !filmService.existsById(filmId)) {
-            return getAllReviews();
+        if (!filmService.existsById(filmId)) {
+            throw new DataNotFoundException("No film with id = " + filmId + " in DB was found.");
         }
         return reviewStorage.getReviewsByFilmId(filmId, count);
+
     }
 
     public void addLikeToReview(long id, long userId) {

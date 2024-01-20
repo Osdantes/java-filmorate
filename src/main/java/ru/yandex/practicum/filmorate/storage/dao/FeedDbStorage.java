@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.dao;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -25,60 +26,92 @@ public class FeedDbStorage implements FeedStorage {
             "insert into events(timestamp, operation, event_type, user_id, entity_id) values(?, ?, ?, ?, ?)";
     private final JdbcTemplate jdbcTemplate;
 
-    private void addFeed(Operation operation, EventType eventType, long userId, long entityId) {
+    private void addFeed(EventType eventType, long userId, long entityId) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement stmt = connection.prepareStatement(INSERT_SQL, new String[]{"id"});
             stmt.setLong(1, Instant.now().toEpochMilli());
-            stmt.setString(2, operation.toString());
+            stmt.setString(2, Operation.ADD.toString());
             stmt.setString(3, eventType.toString());
             stmt.setLong(4, userId);
             stmt.setLong(5, entityId);
             return stmt;
         }, keyHolder);
 
-        log.info("User {} has got an event {} {}.{} with object {}.",
-                userId, keyHolder.getKey().longValue(), operation, eventType, entityId);
+        log.info("User {} has added {} {} with object {}.",
+                userId, keyHolder.getKey().longValue(), eventType, entityId);
+    }
+
+    private void removeFeed(EventType eventType, long userId, long entityId) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            PreparedStatement stmt = connection.prepareStatement(INSERT_SQL, new String[]{"id"});
+            stmt.setLong(1, Instant.now().toEpochMilli());
+            stmt.setString(2, Operation.REMOVE.toString());
+            stmt.setString(3, eventType.toString());
+            stmt.setLong(4, userId);
+            stmt.setLong(5, entityId);
+            return stmt;
+        }, keyHolder);
+
+        log.info("User {} has removed {} {} with object {}.",
+                userId, keyHolder.getKey().longValue(), eventType, entityId);
+    }
+
+    private void updateFeed(EventType eventType, long userId, long entityId) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            PreparedStatement stmt = connection.prepareStatement(INSERT_SQL, new String[]{"id"});
+            stmt.setLong(1, Instant.now().toEpochMilli());
+            stmt.setString(2, Operation.UPDATE.toString());
+            stmt.setString(3, eventType.toString());
+            stmt.setLong(4, userId);
+            stmt.setLong(5, entityId);
+            return stmt;
+        }, keyHolder);
+
+        log.info("User {} has updated {} {} with object {}.",
+                userId, keyHolder.getKey().longValue(), eventType, entityId);
     }
 
     @Override
     public void addReview(long userId, long entityId) {
-        addFeed(Operation.ADD, EventType.REVIEW, userId, entityId);
+        addFeed(EventType.REVIEW, userId, entityId);
     }
 
     @Override
     public void deleteReview(long userId, long entityId) {
-        addFeed(Operation.REMOVE, EventType.REVIEW, userId, entityId);
+        removeFeed(EventType.REVIEW, userId, entityId);
     }
 
     @Override
     public void updateReview(long userId, long entityId) {
-        addFeed(Operation.UPDATE, EventType.REVIEW, userId, entityId);
+        updateFeed(EventType.REVIEW, userId, entityId);
     }
 
     @Override
     public void addLike(long userId, long entityId) {
-        addFeed(Operation.ADD, EventType.LIKE, userId, entityId);
+        addFeed(EventType.LIKE, userId, entityId);
     }
 
     @Override
     public void deleteLike(long userId, long entityId) {
-        addFeed(Operation.REMOVE, EventType.LIKE, userId, entityId);
+        removeFeed(EventType.LIKE, userId, entityId);
     }
 
     @Override
     public void addFriendRequest(long userId, long entityId) {
-        addFeed(Operation.ADD, EventType.FRIEND, userId, entityId);
+        addFeed(EventType.FRIEND, userId, entityId);
     }
 
     @Override
     public void deleteFriendRequest(long userId, long entityId) {
-        addFeed(Operation.REMOVE, EventType.FRIEND, userId, entityId);
+        removeFeed(EventType.FRIEND, userId, entityId);
     }
 
     @Override
     public void acceptFriendRequest(long userId, long entityId) {
-        addFeed(Operation.UPDATE, EventType.FRIEND, userId, entityId);
+        updateFeed(EventType.FRIEND, userId, entityId);
     }
 
     @Override
