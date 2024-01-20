@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.FeedStorage;
@@ -68,6 +67,7 @@ public class ReviewService {
 
         return reviewOpt.orElseThrow(() -> new DataNotFoundException("No review w\nith id = " + id + " in DB was found."));
     }
+
     public List<Review> getAllReviews() {
         return reviewStorage.getAllReviews();
     }
@@ -77,7 +77,6 @@ public class ReviewService {
             throw new DataNotFoundException("No film with id = " + filmId + " in DB was found.");
         }
         return reviewStorage.getReviewsByFilmId(filmId, count);
-
     }
 
     public void addLikeToReview(long id, long userId) {
