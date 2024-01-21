@@ -65,7 +65,7 @@ public class ReviewService {
         }
         Optional<Review> reviewOpt = reviewStorage.getReviewById(id);
 
-        return reviewOpt.orElseThrow(() -> new DataNotFoundException("No review w\nith id = " + id + " in DB was found."));
+        return reviewOpt.orElseThrow(() -> new DataNotFoundException("No review with id = " + id + " in DB was found."));
     }
 
     public List<Review> getAllReviews() {
