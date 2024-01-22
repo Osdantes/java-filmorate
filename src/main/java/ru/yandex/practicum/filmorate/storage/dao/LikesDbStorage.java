@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
 @Slf4j
@@ -24,16 +25,16 @@ public class LikesDbStorage {
     }
 
     public void deleteLike(Film film, User user) {
-        String sql = "delete likes_link where user_id = ? and film_id = ?";
+        String sql = "delete from likes_link where user_id = ? and film_id = ?";
         jdbcTemplate.update(sql, user.getId(), film.getId());
         log.info(String.format("Удален лайк от пользователя %d фильму %d", user.getId(), film.getId()));
     }
 
-    public List<User> getLikesByFilmId(Film film) {
+    public Set<Long> getLikesByFilmId(Film film) {
         return userDbStorage.getLikesByFilmId(film);
     }
 
-    public List<Film> getFilmsPopularList(int count) {
-        return filmDbStorage.getFilmsPopularList(count);
+    public List<Film> getFilmsPopularList(int count, int genreId, int year) {
+        return filmDbStorage.getFilmsPopularList(count, genreId, year);
     }
 }

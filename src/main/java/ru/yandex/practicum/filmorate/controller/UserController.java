@@ -3,7 +3,9 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
@@ -38,12 +40,26 @@ public class UserController {
 
     @PutMapping("/{id}/friends/{friendId}")
     public void addFriend(@PathVariable long id, @PathVariable long friendId) {
+        log.info("Requested creation of friend {} to user {}", friendId, id);
         userService.addFriend(id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
     public void deleteFriend(@PathVariable long id, @PathVariable long friendId) {
+        log.info("Requested deletion of friend {} from user {}", friendId, id);
         userService.deleteFriend(id, friendId);
+    }
+
+    @PostMapping("/{id}/friends/{friendId}")
+    public void acceptFriendRequest(@PathVariable long id, @PathVariable long friendId) {
+        log.info("Accept request for friendship with user {} from user {}", friendId, id);
+        userService.updateFriendRequest(id, friendId);
+    }
+
+    @GetMapping("/{id}/feed")
+    public List<Feed> getEventsList(@PathVariable long id) {
+        log.info("Get events for user {}", id);
+        return userService.getEventsList(id);
     }
 
     @GetMapping("/{id}/friends")
@@ -53,6 +69,17 @@ public class UserController {
 
     @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> getCommonFriendsList(@PathVariable long id, @PathVariable long otherId) {
+        log.info("Requested common friend list between user {} and other user {}", id, otherId);
         return userService.getCommonFriendsList(id, otherId);
+    }
+
+    @GetMapping("/{id}/recommendations")
+    public List<Film> getRecommendations(@PathVariable long id) {
+        return userService.getRecommendations(id);
+    }
+
+    @DeleteMapping("/{userId}")
+    public void deleteUser(@PathVariable Integer userId) {
+        userService.deleteUser(userId);
     }
 }
